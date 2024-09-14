@@ -51,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     private long timeLeftInMillis = 120000;
     private static final long TIMER_INTERVAL = 1000;
 
+    // Track if the hint button has been used
+    private boolean hintUsed = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 if (currentQuestion < questions.length - 1) {
                     currentQuestion++;
                     setQuestion(currentQuestion);
+                    hintUsed = false;
                 } else {
                     endQuiz();
                 }
@@ -108,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 if (currentQuestion > 0) {
                     currentQuestion--;
                     setQuestion(currentQuestion);
+                    hintUsed = false;
                 }
             }
         });
@@ -115,9 +120,12 @@ public class MainActivity extends AppCompatActivity {
         hint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                hintText.setText(options[currentQuestion][correctanswers[currentQuestion]]);
-                score--;
-                scoreText.setText("Score: " + score);
+                if (!hintUsed) {
+                    hintText.setText(options[currentQuestion][correctanswers[currentQuestion]]);
+                    score--;
+                    scoreText.setText("Score: " + score);
+                    hintUsed = true;
+                }
             }
         });
     }
@@ -156,6 +164,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             optionGroup.clearCheck();
         }
+
+        // Re-enable the hint button for the new question
+        hint.setEnabled(true);
+        hintUsed = false;
     }
 
     private void checkAnswer() {
@@ -188,9 +200,9 @@ public class MainActivity extends AppCompatActivity {
     private void endQuiz() {
         countDownTimer.cancel();
         long timeTakenMillis = 120000 - timeLeftInMillis;
-        long timeTakenSeconds = timeTakenMillis / 1000; // Total time taken in seconds
-        long minutes = timeTakenSeconds / 60; // Calculate minutes
-        long seconds = timeTakenSeconds % 60; // Calculate remaining seconds
+        long timeTakenSeconds = timeTakenMillis / 1000; // time taken in seconds
+        long minutes = timeTakenSeconds / 60; // calculaing minutes
+        long seconds = timeTakenSeconds % 60; // Calculating  seconds
 
         String timeTakenFormatted;
         if (minutes > 0) {
@@ -206,7 +218,6 @@ public class MainActivity extends AppCompatActivity {
         nextButton.setEnabled(false);
         previousButton.setEnabled(false);
 
-        start.setVisibility(View.VISIBLE);  // Show start button again after quiz ends
+        start.setVisibility(View.VISIBLE);
     }
-
 }
